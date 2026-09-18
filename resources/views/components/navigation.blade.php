@@ -51,6 +51,12 @@
             <!-- Header Balance Indicators & User Badge -->
             <div class="flex items-center space-x-3">
                 @auth
+                    <!-- User Name Pill -->
+                    <div class="hidden xl:flex items-center px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-xs font-medium text-slate-700 max-w-[160px] truncate" title="{{ $navUser->name }}">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 shrink-0"></span>
+                        <span class="truncate">{{ $navUser->name }}</span>
+                    </div>
+
                     @if ($navWallet)
                         <!-- Purchase Balance -->
                         <a href="{{ route('wallet.index') }}" class="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-slate-100 hover:bg-amber-50 border border-slate-200/80 hover:border-amber-300 transition group" title="Purchase Balance">
@@ -76,12 +82,20 @@
                     <a href="{{ route('wallet.index') }}" class="px-3 py-1.5 rounded-xl gold-gradient-bg text-white text-xs font-semibold shadow-xs hover:brightness-105 active:scale-95 transition">
                         + Deposit
                     </a>
+
+                    <!-- Desktop Logout Form -->
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:border-amber-300 bg-white hover:bg-amber-50 text-slate-600 hover:text-amber-900 text-xs font-medium transition" title="Déconnexion">
+                            Déconnexion
+                        </button>
+                    </form>
                 @else
                     <a href="{{ route('login') }}" class="px-3.5 py-1.5 rounded-xl border border-amber-400/40 text-amber-900 hover:bg-amber-50 text-xs font-semibold shadow-xs transition">
-                        Connexion / Accès Démo
+                        Connexion
                     </a>
-                    <a href="{{ route('login') }}" class="px-3.5 py-1.5 rounded-xl gold-gradient-bg text-white text-xs font-semibold shadow-xs hover:brightness-105 active:scale-95 transition">
-                        + Accès Immédiat
+                    <a href="{{ route('register') }}" class="px-3.5 py-1.5 rounded-xl gold-gradient-bg text-white text-xs font-semibold shadow-xs hover:brightness-105 active:scale-95 transition">
+                        Inscription
                     </a>
                 @endauth
             </div>
@@ -119,10 +133,20 @@
             </button>
         </div>
 
-        <!-- Sidebar Wallet Overview -->
+        <!-- Sidebar User & Wallet Overview -->
         @auth
-            @if ($navWallet)
-                <div class="p-5 bg-amber-50/40 border-b border-amber-400/15">
+            <div class="p-5 bg-amber-50/40 border-b border-amber-400/15">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-amber-200 text-amber-900 font-bold text-xs flex items-center justify-center shrink-0">
+                        {{ strtoupper(substr($navUser->name, 0, 1)) }}
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-xs font-bold text-slate-900 truncate">{{ $navUser->name }}</div>
+                        <div class="text-[11px] text-slate-500 truncate">{{ $navUser->email }}</div>
+                    </div>
+                </div>
+
+                @if ($navWallet)
                     <div class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">Ledger Balances</div>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <div class="p-2.5 rounded-lg bg-white border border-amber-200/60">
@@ -138,15 +162,20 @@
                         <span class="text-slate-600">Ad Traffic Credits:</span>
                         <span class="font-bold text-slate-900">{{ number_format($navWallet->ad_credits) }}</span>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
         @else
             <div class="p-5 bg-amber-50/40 border-b border-amber-400/15">
                 <div class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Aureus Prestige Club</div>
                 <p class="text-xs text-slate-600 mb-3">Trafic publicitaire ciblé et file d'attente FIFO automatisée à 150% de rendement.</p>
-                <a href="{{ route('login') }}" class="block w-full text-center px-4 py-2 rounded-xl gold-gradient-bg text-white text-xs font-semibold shadow-xs hover:brightness-105 transition">
-                    Connexion / Accès Démo
-                </a>
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="{{ route('login') }}" class="text-center px-3 py-2 rounded-xl border border-amber-400/50 bg-white text-amber-900 text-xs font-semibold shadow-xs hover:bg-amber-50 transition">
+                        Connexion
+                    </a>
+                    <a href="{{ route('register') }}" class="text-center px-3 py-2 rounded-xl gold-gradient-bg text-white text-xs font-semibold shadow-xs hover:brightness-105 transition">
+                        Inscription
+                    </a>
+                </div>
             </div>
         @endauth
 
@@ -194,8 +223,20 @@
         </nav>
     </div>
 
-    <!-- Sidebar Bottom Utilities -->
+    <!-- Sidebar Bottom Utilities & Mobile Logout -->
     <div class="p-4 border-t border-slate-100 space-y-3">
+        @auth
+            <form action="{{ route('logout') }}" method="POST" class="w-full">
+                @csrf
+                <button type="submit" class="w-full flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100/80 text-rose-700 text-xs font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Déconnexion</span>
+                </button>
+            </form>
+        @endauth
+
         @if (app()->isLocal())
             <a href="{{ route('browser.showcase') }}" class="flex items-center justify-between p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-900 hover:bg-amber-100 transition">
                 <span>UI Component Atlas</span>

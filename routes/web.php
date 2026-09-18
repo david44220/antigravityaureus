@@ -5,13 +5,13 @@ declare(strict_types=1);
 use App\Http\Controllers\AdDirectoryController;
 use App\Http\Controllers\AdPackController;
 use App\Http\Controllers\AdvertisementController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BrowserShowcaseController;
 use App\Http\Controllers\CyclerQueueController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\WalletController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,21 +32,18 @@ Route::get('/browser', [BrowserShowcaseController::class, 'index'])->name('brows
 Route::get('/directory', [AdDirectoryController::class, 'index'])->name('directory.index');
 Route::get('/directory/click/{ad}', [AdDirectoryController::class, 'click'])->name('directory.click');
 
-// Development & Local Demo Authentication
-Route::get('/login', function () {
-    if (app()->isLocal()) {
-        $user = User::firstOrCreate(
-            ['email' => 'demo@aureus.test'],
-            ['name' => 'Aureus Investor', 'password' => bcrypt('password')]
-        );
-        Auth::login($user);
-        return redirect()->route('dashboard');
-    }
-    abort(403, 'Direct login simulation restricted to local environment.');
-})->name('login');
+// Guest Authentication Routes
+Route::middleware('guest')->group(function (): void {
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
+});
 
 // Authenticated Application Member Routes
 Route::middleware(['auth'])->group(function (): void {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * Test that public landing page returns HTTP 200 for unauthenticated visitors.
      */
@@ -20,7 +22,8 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Aureus', false);
         $response->assertSee('Ad Cycler', false);
-        $response->assertSee('Connexion / Accès Démo', false);
+        $response->assertSee('Connexion', false);
+        $response->assertSee('Inscription', false);
     }
 
     /**
@@ -38,12 +41,12 @@ class ExampleTest extends TestCase
      */
     public function test_authenticated_user_sees_dashboard_link_on_landing_page(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get('/');
 
         $response->assertStatus(200);
         $response->assertSee('Mon Dashboard', false);
-        $response->assertDontSee('Connexion / Accès Démo', false);
+        $response->assertDontSee('Inscription', false);
     }
 }
